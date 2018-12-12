@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button } from '@icedesign/base';
 import TableFilter from './components/TableFilter';
-import CustomTable from './components/CustomTable';
+import TransactionTable from './components/TransactionTable';
 
 export default class Home extends Component {
   static displayName = 'Home';
@@ -22,7 +22,7 @@ export default class Home extends Component {
         </div>
         <div style={styles.pageBody}>
           <TableFilter />
-          <CustomTable />
+          <TransactionTable />
         </div>
       </div>
     );

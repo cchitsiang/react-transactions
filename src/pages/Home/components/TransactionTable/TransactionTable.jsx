@@ -7,8 +7,49 @@ import { compose } from 'redux';
 import injectReducer from '../../../../utils/injectReducer';
 import transactionReducer from '../../../../store/transaction/reducer';
 import { fetchTransactionList, refundTransaction } from '../../../../store/transaction/action';
+import styled from 'styled-components';
 
-import './CustomTable.scss';
+const TransactionContainer = styled.div`
+  table th {
+    background: #f4f4f4;
+  }
+`;
+
+const Splitter = styled.span`
+  margin: 0 8px;
+`;
+
+const Circle = styled.span`
+display: inline-block;
+width: 8px;
+height: 8px;
+border-radius: 50px;
+margin-right: 4px;
+`;
+
+const ColumnContainer = styled.div`
+`;
+
+const GreenCircle = styled(Circle)`
+  background-color: #28a745;
+`;
+
+const RedCircle = styled(Circle)`
+  background-color: #d73535;
+`;
+
+const GreenLabel = styled.span`
+  color: #28a745;
+`;
+
+const RedLabel = styled.span`
+  color: #d73535;
+`;
+
+const StyledPagination = styled(Pagination)`
+  margin: 20px 0;
+  text-align: center;
+`;
 
 class Home extends Component {
   static displayName = 'Home';
@@ -16,7 +57,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      current: 1,
+      currentPage: 1,
     };
   }
 
@@ -39,9 +80,10 @@ class Home extends Component {
     });
   }
 
-  handlePagination = (current) => {
+  handlePagination = (currentPage) => {
+    // TODO: Handle Pagination
     this.setState({
-      current,
+      currentPage,
     });
   };
 
@@ -60,40 +102,30 @@ class Home extends Component {
   };
 
   renderState = (value) => {
-    var color = '#28a745';
-    switch (value) {
-      //TODO: Move REFUNDED to constant
-      case 'REFUNDED':
-        color = '#d73535';
-        break;
-      default:
-        break;
-    }
     return (
-      <div style={styles.state}>
-        <span style={Object.assign({}, styles.circle, {background: color})} />
-        <span style={{color: color}}>{value}</span>
-      </div>
+      <ColumnContainer>
+        {value == 'REFUNDED'? <RedCircle/>: <GreenCircle/>}
+        {value == 'REFUNDED'? <RedLabel>{value}</RedLabel>: <GreenLabel>{value}</GreenLabel>}
+      </ColumnContainer>
     );
   };
 
   renderAction = (value, index) => {
-    const splitSpan = <span className="actions-split">|</span>;
     const viewAction = <Link to="view">View</Link>;
     const refundAction = <a href="javascrpt:void(0)" onClick={this.onClickRefund.bind(this, value, index)}>Refund</a>;
     return (
-      <div>
+      <ColumnContainer>
         {viewAction}
-        {splitSpan}
+        <Splitter>|</Splitter>
         {refundAction}
-      </div>
+      </ColumnContainer>
     );
   };
 
   render() {
     const { transactionList = [] } = this.props;
     return (
-      <div>
+      <TransactionContainer>
         <Table
           dataSource={transactionList}
           onSort={this.handleSort}
@@ -115,40 +147,28 @@ class Home extends Component {
           />
           <Table.Column title="Action" dataIndex="transactionID" cell={this.renderAction} />
         </Table>
-        <Pagination
-          style={styles.pagination}
-          current={this.state.current}
+        <StyledPagination
+          locale={{
+            prev: 'Previous',
+            next: 'Next',
+            goTo: 'Go to',
+            page: 'Page',
+            go: 'Go',
+            pageSize: 'Items per page:'
+          }}
+          current={this.state.currentPage}
           onChange={this.handlePagination}
         />
-      </div>
+      </TransactionContainer>
     );
   }
 }
-
-const styles = {
-  pagination: {
-    margin: '20px 0',
-    textAlign: 'center',
-  },
-  editIcon: {
-    color: '#999',
-    cursor: 'pointer',
-  },
-  circle: {
-    display: 'inline-block',
-    width: '8px',
-    height: '8px',
-    borderRadius: '50px',
-    marginRight: '4px',
-  },
-};
 
 const mapDispatchToProps = {
   fetchTransactionList, refundTransaction
 };
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return { transactionList: state.transaction && state.transaction.data || [], };
 };
 

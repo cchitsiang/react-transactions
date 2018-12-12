@@ -47,7 +47,6 @@ const refundTransactionFailure = (payload) => {
 };
 
 const refundTransactionSuccess = (payload) => {
-  console.log(payload)
   return {
     type: REFUND_TRANSACTION_SUCCESS,
     isLoading: false,
