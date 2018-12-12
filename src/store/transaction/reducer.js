@@ -7,30 +7,30 @@ import {
   REFUND_TRANSACTION_SUCCESS,
 } from './constants';
 
-const initialState = {};
+const initialState = {isLoading: false};
 
 function transactionReducer(state = initialState, action) {
   switch (action.type) {
     case TRANSACTION_LIST_REQUEST:
       return Object.assign({}, state, {
-        isLoading: action.isLoading,
+        isLoading: true,
       });
     case TRANSACTION_LIST_FAILURE:
       return Object.assign({}, state, {
-        isLoading: action.isLoading,
+        isLoading: false,
       });
     case TRANSACTION_LIST_SUCCESS:
       return Object.assign({}, state, {
-        isLoading: action.isLoading,
+        isLoading: false,
         ...action.payload,
       });
     case REFUND_TRANSACTION_REQUEST:
       return Object.assign({}, state, {
-        isLoading: action.isLoading,
+        isLoading: true,
       });
     case REFUND_TRANSACTION_FAILURE:
       return Object.assign({}, state, {
-        isLoading: action.isLoading,
+        isLoading: false,
       });
     case REFUND_TRANSACTION_SUCCESS:
       var transactions = state.data;
@@ -46,7 +46,7 @@ function transactionReducer(state = initialState, action) {
         );
       }
       return Object.assign({}, state, {
-        isLoading: action.isLoading,
+        isLoading: false,
         data: transactions
       });
     default:

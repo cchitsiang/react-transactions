@@ -11,14 +11,12 @@ import { getTransactions, postRefundTransaction } from '../../api';
 const transactionListRequest = () => {
   return {
     type: TRANSACTION_LIST_REQUEST,
-    isLoading: true,
   };
 };
 
 const transactionListFailure = (payload) => {
   return {
     type: TRANSACTION_LIST_FAILURE,
-    isLoading: false,
     payload,
   };
 };
@@ -26,7 +24,6 @@ const transactionListFailure = (payload) => {
 const transactionListSuccess = (payload) => {
   return {
     type: TRANSACTION_LIST_SUCCESS,
-    isLoading: false,
     payload,
   };
 };
@@ -34,14 +31,12 @@ const transactionListSuccess = (payload) => {
 const refundTransactionRequest = () => {
   return {
     type: REFUND_TRANSACTION_REQUEST,
-    isLoading: true,
   };
 };
 
 const refundTransactionFailure = (payload) => {
   return {
     type: REFUND_TRANSACTION_FAILURE,
-    isLoading: false,
     payload,
   };
 };
@@ -49,7 +44,6 @@ const refundTransactionFailure = (payload) => {
 const refundTransactionSuccess = (payload) => {
   return {
     type: REFUND_TRANSACTION_SUCCESS,
-    isLoading: false,
     payload,
   };
 };
