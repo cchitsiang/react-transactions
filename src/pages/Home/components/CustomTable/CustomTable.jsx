@@ -1,47 +1,40 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Table, Pagination, Icon, Dialog } from '@icedesign/base';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+
+import injectReducer from '../../../../utils/injectReducer';
+import transactionReducer from '../../../../store/transaction/reducer';
+import { fetchTransactionList, refundTransaction } from '../../../../store/transaction/action';
+
 import './CustomTable.scss';
 
-const getData = () => {
-  return Array.from({ length: 20 }).map((item, index) => {
-    return {
-      transactionID: 'T6569400-1516-0A3F-E3FA-7F222CC79221',
-      transactionDate: '2018-12-08',
-      transactionType: 'Payment',
-      paymentMethod: 'Card',
-      amount: 412,
-      currency: 'MYR',
-      amountText: 'RM 412.00',
-      statusCode: 1,
-      status: 'OK',
-      description: 'Ride',
-      createdAt: 1544235050
-    }
-  });
-};
-
-export default class Home extends Component {
+class Home extends Component {
   static displayName = 'Home';
 
   constructor(props) {
     super(props);
     this.state = {
       current: 1,
-      dataSource: getData(),
     };
   }
 
-  onClickDelete = () => {
+  componentDidMount() {
+    this.props.fetchTransactionList();
+  }
+
+  onClickRefund = (transactionId, index) => {
     Dialog.confirm({
       title: 'Refund Transaction',
       locale: {
         ok: 'OK',
-      cancel: 'Cancel' },
+        cancel: 'Cancel'
+      },
       style: { width: '400px' },
       content: 'Are you sure you want to refund this transaction',
       onOk: () => {
-        // TODO
+        this.props.refundTransaction({ transactionId });
       },
     });
   }
@@ -67,18 +60,27 @@ export default class Home extends Component {
   };
 
   renderState = (value) => {
+    var color = '#28a745';
+    switch (value) {
+      //TODO: Move REFUNDED to constant
+      case 'REFUNDED':
+        color = '#d73535';
+        break;
+      default:
+        break;
+    }
     return (
       <div style={styles.state}>
-        <span style={styles.circle} />
-        <span style={styles.stateText}>{value}</span>
+        <span style={Object.assign({}, styles.circle, {background: color})} />
+        <span style={{color: color}}>{value}</span>
       </div>
     );
   };
 
-  renderAction = () => {
+  renderAction = (value, index) => {
     const splitSpan = <span className="actions-split">|</span>;
     const viewAction = <Link to="view">View</Link>;
-    const refundAction = <a href="javascrpt:void(0)" onClick={this.onClickDelete}>Refund</a>;
+    const refundAction = <a href="javascrpt:void(0)" onClick={this.onClickRefund.bind(this, value, index)}>Refund</a>;
     return (
       <div>
         {viewAction}
@@ -89,11 +91,11 @@ export default class Home extends Component {
   };
 
   render() {
-    const { dataSource } = this.state;
+    const { transactionList = [] } = this.props;
     return (
       <div>
         <Table
-          dataSource={dataSource}
+          dataSource={transactionList}
           onSort={this.handleSort}
           hasBorder={false}
           className="custom-table"
@@ -111,7 +113,7 @@ export default class Home extends Component {
             dataIndex="status"
             cell={this.renderState}
           />
-          <Table.Column title="Action" cell={this.renderAction} />
+          <Table.Column title="Action" dataIndex="transactionID" cell={this.renderAction} />
         </Table>
         <Pagination
           style={styles.pagination}
@@ -134,13 +136,33 @@ const styles = {
   },
   circle: {
     display: 'inline-block',
-    background: '#28a745',
     width: '8px',
     height: '8px',
     borderRadius: '50px',
     marginRight: '4px',
   },
-  stateText: {
-    color: '#28a745',
-  },
 };
+
+const mapDispatchToProps = {
+  fetchTransactionList, refundTransaction
+};
+
+const mapStateToProps = (state) => {
+  console.log(state);
+  return { transactionList: state.transaction && state.transaction.data || [], };
+};
+
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps
+);
+
+const withTransactionReducer = injectReducer({
+  key: 'transaction',
+  reducer: transactionReducer,
+});
+
+export default compose(
+  withTransactionReducer,
+  withConnect
+)(Home);

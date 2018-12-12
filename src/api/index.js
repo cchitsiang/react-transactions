@@ -27,8 +27,21 @@ export async function getUserProfile() {
   return axios('/api/profile');
 }
 
+export async function getTransactions() {
+  return axios('/api/transactions')
+}
+
+export async function postRefundTransaction(params) {
+  return axios({
+    url: `/api/transactions/${params.transactionId}/refund`,
+    method: 'post',
+  });
+}
+
 export default {
   postUserRegister,
   postUserLogout,
   getUserProfile,
+  getTransactions,
+  postRefundTransaction
 };
